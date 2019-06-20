@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.massz.core.dao.StudentDao">
+    <!--SQL片段-->
+    <sql id="selectStudentListWhere">
+        <where>
+            <if test="stu_sno != null ">
+                stu_sno LIKE "%"#{stu_sno}"%"
+            </if>
+            <if test="stu_name != null ">
+                AND stu_name like "%"#{stu_name}"%"
+            </if>
+            <if test="classs != null ">
+                AND s.classs = #{classs}
+            </if>
+        </where>
+    </sql>
+    <!--查询学生列表-->
+    <select id="selectStudentList" parameterType="student" resultType="student">
+        <!--SELECT s.stu_sno,s.stu_name,s.stu_gender,c.chinese,c.maths,c.english,c.physical,c.pc,c.history,s.classs
+        FROM course AS c RIGHT JOIN student AS s ON c.stu_sno = s.stu_sno -->
+        SELECT s.`id`,s.`stu_sno`,s.`stu_name`,s.`stu_gender`,s.`chinese`,s.`maths`,s.`english`,s.`physical`,s.`pc`,s.`history`,s.`classs`
+        FROM student AS s
+        left join (
+            select
+              id,
+              classs
+            from
+              local
+            where
+            typeid=1
+        ) l ON s.classs = l.id
+        <include refid="selectStudentListWhere" />
+
+        <!--执行分页查询-->
+        <if test="start !=null and rows !=null">
+            LIMIT #{start}, #{rows};
+        </if>
+    </select>
+    <!--查询学生总数-->
+    <select id="selectStudentListCount" resultType="Integer" parameterType="Student">
+        select count(*) from student AS s
+        <include refid="selectStudentListWhere"/>
+    </select>
+    <!--增加学生-->
+    <insert id="createStudent" parameterType="Student">
+        insert into student(
+              stu_sno,
+              stu_name,
+              stu_age,
+              stu_gender,
+              stu_phone,
+              chinese,
+              maths,
+              english,
+              physical,
+              pc,
+              history,
+              classs,
+              create_id,
+              create_time
+        )
+        values (#{stu_sno},#{stu_name},#{stu_age},#{stu_gender},
+        #{stu_phone},#{chinese},#{maths},#{english},#{physical},#{pc},#{history},#{classs},#{create_id},#{create_time})
+    </insert>
+    <!--通过id获取学生信息-->
+    <select id="getStudentById" resultType="Student" parameterType="Student">
+        select * from student where id = #{id}
+    </select>
+    <!--修改学生信息-->
+    <update id="updateStudent" parameterType="Student" >
+        update student
+        <set>
+        <if test="stu_sno != null">
+            stu_sno = #{stu_sno},
+        </if>
+        <if test="stu_name != null">
+            stu_name = #{stu_name},
+        </if>
+            <if test="stu_age != null">
+                stu_age = #{stu_age},
+            </if>
+            <if test="stu_gender != null">
+                stu_gender = #{stu_gender},
+            </if>
+            <if test="stu_phone != null">
+                stu_phone = #{stu_phone},
+            </if>
+            <if test="chinese != null">
+                chinese = #{chinese},
+            </if>
+            <if test="maths != null">
+                maths = #{maths},
+            </if>
+            <if test="english != null">
+                english = #{english},
+            </if>
+            <if test="physical != null">
+                physical = #{physical},
+            </if>
+            <if test="pc != null">
+                pc = #{pc},
+            </if>
+            <if test="history != null">
+                history = #{history},
+            </if>
+            <if test="classs != null">
+                classs = #{classs},
+            </if>
+            <if test="create_id != null">
+                create_id = #{create_id},
+            </if>
+            <if test="create_time != null">
+                create_time = #{create_time},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <!--根据id删除学生-->
+    <delete id="deleteStudent" parameterType="Student">
+        delete from student where id = #{id}
+    </delete>
+</mapper>
